@@ -215,7 +215,7 @@ def extract_row_data(market: Dict) -> Dict[str, Any]:
             site_execution = site_exec_data.get('libelle')
 
     return {
-        'Region': market.get('Région'),
+        'Region': market.get('Region'),
         'Agence': market.get('Agence'),
         'Nom de l\'AO': market.get('objet_marche'),
         'Lieu des travaux': site_execution,
