@@ -672,12 +672,26 @@ def write_json_file(path: Path, records: list[dict[str, Any]]) -> None:
         json.dump(records, file, ensure_ascii=False, indent=2)
 
 
-def write_csv_file(path: Path, columns: list[str], rows: list[dict[str, Any]]) -> None:
-    with path.open("w", encoding="utf-8", newline="") as file:
+def read_csv_rows(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    with path.open("r", encoding="utf-8", newline="") as file:
+        reader = csv.DictReader(file)
+        return [row for row in reader]
+
+
+def append_csv_file(path: Path, columns: list[str], rows: list[dict[str, Any]]) -> None:
+    file_exists = path.exists()
+    with path.open("a" if file_exists else "w", encoding="utf-8", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=columns)
-        writer.writeheader()
+        if not file_exists:
+            writer.writeheader()
         for row in rows:
             writer.writerow({column: to_cell_text(row.get(column, "")) for column in columns})
+
+
+def write_csv_file(path: Path, columns: list[str], rows: list[dict[str, Any]]) -> None:
+    append_csv_file(path, columns, rows)
 
 
 def excel_column_name(index_1_based: int) -> str:
@@ -968,13 +982,14 @@ def main() -> int:
 
     write_json_file(json_file, details)
     write_csv_file(csv_file, columns, flattened_rows)
-    write_xlsx_file(xlsx_file, columns, flattened_rows)
+    all_rows = read_csv_rows(csv_file)
+    write_xlsx_file(xlsx_file, columns, all_rows)
     if errors:
         write_json_file(errors_file, errors)
 
     print(f"Wrote {json_file}", file=sys.stderr)
-    print(f"Wrote {csv_file}", file=sys.stderr)
-    print(f"Wrote {xlsx_file}", file=sys.stderr)
+    print(f"Updated {csv_file}", file=sys.stderr)
+    print(f"Updated {xlsx_file}", file=sys.stderr)
     if errors:
         print(f"Wrote {errors_file}", file=sys.stderr)
 

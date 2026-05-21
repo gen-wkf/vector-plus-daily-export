@@ -63,6 +63,9 @@ Ce dépôt contient un workflow GitHub Actions qui exécute chaque matin ces deu
    - `all_markets_table.csv`
    - `all_markets_table.xlsx`
    - `all_markets_errors.json`
+
+> Les fichiers CSV sont mis à jour en mode ajout si ils existent déjà. Le XLSX est reconstruit à partir du CSV cumulatif pour conserver les données précédentes.
+
 6. Le workflow commite et pousse automatiquement ces fichiers dans la branche du dépôt si des changements sont détectés.
 7. Les résultats sont également sauvegardés comme artefacts GitHub Actions.
 

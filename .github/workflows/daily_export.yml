@@ -5,6 +5,9 @@ on:
     - cron: '0 6 * * *'  # Tous les jours à 06:00 UTC
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   daily-export:
     runs-on: ubuntu-latest
@@ -20,6 +23,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Setup Python
         uses: actions/setup-python@v5

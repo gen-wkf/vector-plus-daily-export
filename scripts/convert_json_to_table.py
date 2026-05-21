@@ -382,6 +382,23 @@ def create_xlsx_file(xlsx_file: str, columns: List[str], rows: List[Dict[str, An
             zf.writestr(filename, content)
 
 
+def read_csv_rows(csv_file: str) -> List[Dict[str, Any]]:
+    if not Path(csv_file).exists():
+        return []
+    with open(csv_file, 'r', encoding='utf-8-sig', newline='') as f:
+        reader = csv.DictReader(f)
+        return [row for row in reader]
+
+
+def append_csv_rows(csv_file: str, columns: List[str], rows: List[Dict[str, Any]]) -> None:
+    file_exists = Path(csv_file).exists()
+    with open(csv_file, 'a' if file_exists else 'w', newline='', encoding='utf-8-sig') as f:
+        writer = csv.DictWriter(f, fieldnames=columns)
+        if not file_exists:
+            writer.writeheader()
+        writer.writerows(rows)
+
+
 def convert_json_to_csv_and_xlsx(json_file: str, output_prefix: str = 'output') -> None:
     """
     Convertit un fichier JSON en fichiers CSV et XLSX.
@@ -432,20 +449,18 @@ def convert_json_to_csv_and_xlsx(json_file: str, output_prefix: str = 'output') 
             print(f"Erreur lors du traitement d'un élément: {e}")
             continue
 
-    # Créer le fichier CSV
+    # Créer / mettre à jour le fichier CSV
     csv_file = f"{output_prefix}.csv"
-    with open(csv_file, 'w', newline='', encoding='utf-8-sig') as f:
-        writer = csv.DictWriter(f, fieldnames=columns)
-        writer.writeheader()
-        writer.writerows(rows)
-    print(f"✓ Fichier CSV créé: {csv_file}")
+    append_csv_rows(csv_file, columns, rows)
+    print(f"✓ Fichier CSV mis à jour: {csv_file}")
 
-    # Créer le fichier XLSX
+    # Reconstruire le XLSX à partir du CSV cumulatif
     xlsx_file = f"{output_prefix}.xlsx"
-    create_xlsx_file(xlsx_file, columns, rows)
-    print(f"✓ Fichier XLSX créé: {xlsx_file}")
+    all_rows = read_csv_rows(csv_file)
+    create_xlsx_file(xlsx_file, columns, all_rows)
+    print(f"✓ Fichier XLSX mis à jour: {xlsx_file}")
 
-    print(f"\nRésumé: {len(rows)} enregistrements traités")
+    print(f"\nRésumé: {len(rows)} enregistrements ajoutés, {len(all_rows)} enregistrements totaux")
 
 
 if __name__ == "__main__":
