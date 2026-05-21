@@ -11,6 +11,11 @@ jobs:
     env:
       PASSWORD: ${{ secrets.VECTEUR_PLUS_PASSWORD }}
       BASE_URL: ${{ secrets.VECTEUR_PLUS_BASE_URL }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+      SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+      RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
 
     steps:
       - name: Checkout repository
@@ -31,7 +36,7 @@ jobs:
 
       - name: Run convert_json_to_table.py
         run: |
-          python scripts/convert_json_to_table.py responses/all_markets.json responses/all_markets_table
+          python scripts/convert_json_to_table.py responses/all_markets.json responses/markets
 
       - name: Commit generated export files
         run: |
@@ -45,6 +50,17 @@ jobs:
             git push
           fi
 
+      - name: Send export via email
+        if: env.SENDER_EMAIL != ''
+        run: |
+          python scripts/send_export_mail.py \
+            "$SMTP_HOST" \
+            "$SMTP_PORT" \
+            "$SENDER_EMAIL" \
+            "$SENDER_PASSWORD" \
+            "$RECIPIENT_EMAIL" \
+            "responses/markets.xlsx"
+
       - name: Upload export artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -53,6 +69,6 @@ jobs:
             responses/all_markets.json
             responses/all_markets.csv
             responses/all_markets.xlsx
-            responses/all_markets_table.csv
-            responses/all_markets_table.xlsx
+            responses/markets.csv
+            responses/markets.xlsx
             responses/all_markets_errors.json
