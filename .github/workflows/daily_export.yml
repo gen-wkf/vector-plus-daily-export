@@ -15,6 +15,8 @@ jobs:
       VECTEUR_PLUS_PASSWORD: ${{ secrets.VECTEUR_PLUS_PASSWORD }}
       BASE_URL_VECTEUR_PLUS: ${{ secrets.VECTEUR_PLUS_BASE_URL }}
       BASE_URL: ${{ secrets.VECTEUR_PLUS_BASE_URL }}
+      ID_CLIENTS: ${{ secrets.ID_CLIENTS }}
+      ID_APPLICATIONS: ${{ secrets.ID_APPLICATIONS }}
       SMTP_HOST: ${{ secrets.SMTP_HOST }}
       SMTP_PORT: ${{ secrets.SMTP_PORT }}
       SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
@@ -37,6 +39,12 @@ jobs:
           cmd=(python scripts/export_vecteur_markets.py --output-prefix responses/all_markets --password "$VECTEUR_PLUS_PASSWORD")
           if [ -n "$BASE_URL" ]; then
             cmd+=(--base-url "$BASE_URL")
+          fi
+          if [ -n "$ID_CLIENTS" ]; then
+            cmd+=(--client-ids "$ID_CLIENTS")
+          fi
+          if [ -n "$ID_APPLICATIONS" ]; then
+            cmd+=(--application-ids "$ID_APPLICATIONS")
           fi
           "${cmd[@]}"
 

@@ -849,9 +849,11 @@ def main() -> int:
         print("workers must be >= 1", file=sys.stderr)
         return 2
 
+    env_client_ids = os.environ.get("ID_CLIENTS", "")
+    env_application_ids = os.environ.get("ID_APPLICATIONS", "")
     try:
-        client_filter = parse_id_filter(args.client_ids)
-        application_filter = parse_id_filter(args.application_ids)
+        client_filter = parse_id_filter(args.client_ids or env_client_ids)
+        application_filter = parse_id_filter(args.application_ids or env_application_ids)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2

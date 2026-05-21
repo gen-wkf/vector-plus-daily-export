@@ -12,7 +12,12 @@ Ce dépôt contient un workflow GitHub Actions qui exécute chaque matin ces deu
 - `VECTEUR_PLUS_PASSWORD` : Mot de passe Vecteur Plus
 - `VECTEUR_PLUS_BASE_URL` : URL de base Vecteur Plus
 
-> `app.http` n'est plus nécessaire pour le workflow GitHub Actions. Le script lit maintenant `VECTEUR_PLUS_PASSWORD` et `VECTEUR_PLUS_BASE_URL` depuis les secrets / variables d'environnement.
+### Secrets GitHub optionnels (pour le filtrage)
+
+- `ID_CLIENTS` : Liste CSV des IDs de clients à traiter (ex: `2370,3842`)
+- `ID_APPLICATIONS` : Liste CSV des IDs d'applications à traiter (ex: `37508,46228`)
+
+> `app.http` n'est plus nécessaire pour le workflow GitHub Actions. Le script lit maintenant `VECTEUR_PLUS_PASSWORD`, `VECTEUR_PLUS_BASE_URL`, `ID_CLIENTS` et `ID_APPLICATIONS` depuis les secrets / variables d'environnement.
 
 ### Secrets GitHub optionnels (pour l'email)
 
