@@ -2,7 +2,7 @@ name: Daily Vecteur Plus Export
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # Tous les jours à 06:00 UTC
+    - cron: "0 6 * * *" # Tous les jours à 06:00 UTC
   workflow_dispatch:
 
 permissions:
@@ -12,7 +12,8 @@ jobs:
   daily-export:
     runs-on: ubuntu-latest
     env:
-      PASSWORD: ${{ secrets.VECTEUR_PLUS_PASSWORD }}
+      VECTEUR_PLUS_PASSWORD: ${{ secrets.VECTEUR_PLUS_PASSWORD }}
+      BASE_URL_VECTEUR_PLUS: ${{ secrets.VECTEUR_PLUS_BASE_URL }}
       BASE_URL: ${{ secrets.VECTEUR_PLUS_BASE_URL }}
       SMTP_HOST: ${{ secrets.SMTP_HOST }}
       SMTP_PORT: ${{ secrets.SMTP_PORT }}
@@ -29,11 +30,11 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Run export_vecteur_markets.py
         run: |
-          cmd=(python scripts/export_vecteur_markets.py --output-prefix responses/all_markets --password "$PASSWORD")
+          cmd=(python scripts/export_vecteur_markets.py --output-prefix responses/all_markets --password "$VECTEUR_PLUS_PASSWORD")
           if [ -n "$BASE_URL" ]; then
             cmd+=(--base-url "$BASE_URL")
           fi

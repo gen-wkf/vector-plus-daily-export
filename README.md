@@ -10,6 +10,9 @@ Ce dépôt contient un workflow GitHub Actions qui exécute chaque matin ces deu
 ### Secrets GitHub requis (obligatoires)
 
 - `VECTEUR_PLUS_PASSWORD` : Mot de passe Vecteur Plus
+- `VECTEUR_PLUS_BASE_URL` : URL de base Vecteur Plus
+
+> `app.http` n'est plus nécessaire pour le workflow GitHub Actions. Le script lit maintenant `VECTEUR_PLUS_PASSWORD` et `VECTEUR_PLUS_BASE_URL` depuis les secrets / variables d'environnement.
 
 ### Secrets GitHub optionnels (pour l'email)
 

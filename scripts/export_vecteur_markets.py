@@ -15,6 +15,7 @@ from copy import deepcopy
 import csv
 from datetime import date, timedelta
 import json
+import os
 import re
 import socket
 import sys
@@ -177,17 +178,25 @@ def resolve_base_url(args: argparse.Namespace) -> str:
     if args.base_url:
         return args.base_url.rstrip("/")
 
+    env_base_url = (
+        os.environ.get("BASE_URL")
+        or os.environ.get("BASE_URL_VECTEUR_PLUS")
+        or os.environ.get("VECTEUR_PLUS_BASE_URL")
+    )
+    if env_base_url:
+        return env_base_url.rstrip("/")
+
     base_url = read_http_variable(args.http_file, "base_url_vecteur_plus")
     if base_url:
         return base_url.rstrip("/")
 
     if not args.http_file.exists():
         raise RuntimeError(
-            f"Unable to read {args.http_file} and no --base-url was provided."
+            "Unable to read app.http and no --base-url was provided."
         )
     raise RuntimeError(
         f"Could not extract @base_url_vecteur_plus from {args.http_file}. "
-        "Pass --base-url explicitly."
+        "Provide --base-url or set BASE_URL_VECTEUR_PLUS / VECTEUR_PLUS_BASE_URL."
     )
 
 
@@ -883,10 +892,15 @@ def main() -> int:
         print(str(exc), file=sys.stderr)
         return 1
 
-    password = args.password or read_http_login_password(args.http_file)
+    password = (
+        args.password
+        or os.environ.get("VECTEUR_PLUS_PASSWORD")
+        or read_http_login_password(args.http_file)
+    )
     if not password:
         print(
-            f"No login password found. Provide --password or add it to {args.http_file}.",
+            f"No login password found. Provide --password, set VECTEUR_PLUS_PASSWORD, "
+            f"or add it to {args.http_file}.",
             file=sys.stderr,
         )
         return 1
