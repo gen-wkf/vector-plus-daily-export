@@ -5,50 +5,50 @@ Ce script convertit un fichier JSON contenant un array en fichiers CSV et XLSX s
 ## Installation et utilisation
 
 ### Prérequis
+
 - Python 3.6+
 - Aucune dépendance externe (utilise uniquement les bibliothèques standard Python)
 
 ### Utilisation basique
 
 ```bash
-cd /home/links/IdeaProjects/Work/interface-dsa/scripts
-python3 convert_json_to_table.py ../responses/all_markets.json ../responses/output
+cd /home/links/Desktop/Codes/python/vector-plus-daily-export/scripts
+python3 convert_json_to_table.py ../responses/all_markets.json ../responses/markets
 ```
 
 Cela générera deux fichiers:
-- `output.csv` - Fichier CSV
-- `output.xlsx` - Fichier XLSX
+
+- `../responses/markets.csv`
+- `../responses/markets.xlsx`
 
 ### Avec les fichiers existants
 
-Les fichiers de sortie se trouvent actuellement dans:
-- `/home/links/IdeaProjects/Work/interface-dsa/responses/markets_export.csv`
-- `/home/links/IdeaProjects/Work/interface-dsa/responses/markets_export.xlsx`
+Si les fichiers existent déjà, le script ajoute les nouvelles lignes au CSV existant et reconstruit le XLSX cumulatif à partir du CSV.
 
 ## Mappages de colonnes
 
 Le script extrait les colonnes suivantes:
 
-| Colonne | Source JSON | Logique |
-|---------|------------|--------|
-| Nom de l'AO | `objet_marche` | Valeur directe |
-| Lieu des travaux | `localisation/site_execution[0]/libelle` | Extrait le libelle du premier élément |
-| Etablissement SMAC | - | À remplir manuellement (vide par défaut) |
-| Source de l'AO | - | Défaut: "Vecteur Plus" |
-| Date de Saisie | `application_data/livraison/date_premiere_livraison` | Format: YYYY-MM-DD |
-| SI Rectificatif | `application_data/livraison/motif` | Valeur directe |
-| Nom du Client final | `participation/societes_intervenantes` | MOA > CATEGORIE > null |
-| Date limite remise offre | `calendrier/date_limite_remise_offres/date` | Format: YYYY-MM-DD |
-| Heure limite de remise offre | `calendrier/date_limite_remise_offres/date` | Format: HH:mm |
-| Nom de l'architecte | `participation/societes_intervenantes` | Recherche role.code = "architecte" |
-| Nom de l'économiste | `participation/societes_intervenantes` | Recherche role.code = "economiste" |
-| Nom de l'entreprise générale | `participation/societes_intervenantes` | Code = "entreprise_generale" > libelle = "Entreprise autre" |
-| Public/Privé | `qualification/type_procedure/libelle` | Valeur directe |
-| Nature du projet | `qualification/natures_projet` | Jointure si array |
-| Visite de site | `qualification/renseignements_complementaires` | Coalesce (premier non-null) |
-| Lien vers AO | `qualification/dce_url` ou `dce_data/url` | Coalesce (premier non-null) |
-| Technique | `qualification/renseignements_techniques` | Valeur directe |
-| Description technique | `lotissement/lots[]/objet_lot` | Jointure de tous les objets |
+| Colonne                      | Source JSON                                          | Logique                                                     |
+| ---------------------------- | ---------------------------------------------------- | ----------------------------------------------------------- |
+| Nom de l'AO                  | `objet_marche`                                       | Valeur directe                                              |
+| Lieu des travaux             | `localisation/site_execution[0]/libelle`             | Extrait le libelle du premier élément                       |
+| Etablissement SMAC           | -                                                    | À remplir manuellement (vide par défaut)                    |
+| Source de l'AO               | -                                                    | Défaut: "Vecteur Plus"                                      |
+| Date de Saisie               | `application_data/livraison/date_premiere_livraison` | Format: YYYY-MM-DD                                          |
+| SI Rectificatif              | `application_data/livraison/motif`                   | Valeur directe                                              |
+| Nom du Client final          | `participation/societes_intervenantes`               | MOA > CATEGORIE > null                                      |
+| Date limite remise offre     | `calendrier/date_limite_remise_offres/date`          | Format: YYYY-MM-DD                                          |
+| Heure limite de remise offre | `calendrier/date_limite_remise_offres/date`          | Format: HH:mm                                               |
+| Nom de l'architecte          | `participation/societes_intervenantes`               | Recherche role.code = "architecte"                          |
+| Nom de l'économiste          | `participation/societes_intervenantes`               | Recherche role.code = "economiste"                          |
+| Nom de l'entreprise générale | `participation/societes_intervenantes`               | Code = "entreprise_generale" > libelle = "Entreprise autre" |
+| Public/Privé                 | `qualification/type_procedure/libelle`               | Valeur directe                                              |
+| Nature du projet             | `qualification/natures_projet`                       | Jointure si array                                           |
+| Visite de site               | `qualification/renseignements_complementaires`       | Coalesce (premier non-null)                                 |
+| Lien vers AO                 | `qualification/dce_url` ou `dce_data/url`            | Coalesce (premier non-null)                                 |
+| Technique                    | `qualification/renseignements_techniques`            | Valeur directe                                              |
+| Description technique        | `lotissement/lots[]/objet_lot`                       | Jointure de tous les objets                                 |
 
 ## Structure du JSON attendue
 
@@ -90,11 +90,13 @@ Le fichier JSON doit contenir un array d'objets de marché:
 ## Fichiers CSV et XLSX générés
 
 ### Format CSV
+
 - Encodage: UTF-8
 - Séparateur: Virgule (,)
 - En-têtes: Inclus
 
 ### Format XLSX
+
 - Feuillea: "Données"
 - Première ligne: En-têtes avec fond bleu et texte blanc
 - Largeur des colonnes: Ajustée à 20 caractères
@@ -136,4 +138,3 @@ Ajoutez des fonctions d'extraction et mettez à jour `extract_row_data()`.
 
 Pour toute question ou modification, consultez le script source:
 `/home/links/IdeaProjects/Work/interface-dsa/scripts/convert_json_to_table.py`
-

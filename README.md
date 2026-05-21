@@ -54,20 +54,20 @@ Ce dépôt contient un workflow GitHub Actions qui exécute chaque matin ces deu
 1. Pousse le projet dans un dépôt GitHub.
 2. Crée les secrets GitHub (voir section Configuration Gmail ci-dessus).
 3. Vérifie que le fichier `/.github/workflows/daily_export.yml` existe.
-
-4. Le workflow est planifié pour s'exécuter tous les jours à `06:00 UTC`.
-5. Il génère les fichiers suivants dans `responses/` :
+4. Crée une branche `links` pour tes développements avant de fusionner vers `main` via pull request.
+5. Le workflow est planifié pour s'exécuter tous les jours à `06:00 UTC`.
+6. Il génère les fichiers suivants dans `responses/` :
    - `all_markets.json`
    - `all_markets.csv`
    - `all_markets.xlsx`
-   - `all_markets_table.csv`
-   - `all_markets_table.xlsx`
+   - `markets.csv`
+   - `markets.xlsx`
    - `all_markets_errors.json`
 
 > Les fichiers CSV sont mis à jour en mode ajout si ils existent déjà. Le XLSX est reconstruit à partir du CSV cumulatif pour conserver les données précédentes.
 
-6. Le workflow commite et pousse automatiquement ces fichiers dans la branche du dépôt si des changements sont détectés.
-7. Les résultats sont également sauvegardés comme artefacts GitHub Actions.
+7. Le workflow commite et pousse automatiquement ces fichiers dans la branche du dépôt si des changements sont détectés.
+8. Les résultats sont également sauvegardés comme artefacts GitHub Actions.
 
 ### Ajuster l'horaire
 
