@@ -675,6 +675,7 @@ def write_json_file(path: Path, records: list[dict[str, Any]]) -> None:
 def read_csv_rows(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
+    csv.field_size_limit(10 * 1024 * 1024)
     with path.open("r", encoding="utf-8", newline="") as file:
         reader = csv.DictReader(file)
         return [row for row in reader]

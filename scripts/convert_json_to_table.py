@@ -385,6 +385,7 @@ def create_xlsx_file(xlsx_file: str, columns: List[str], rows: List[Dict[str, An
 def read_csv_rows(csv_file: str) -> List[Dict[str, Any]]:
     if not Path(csv_file).exists():
         return []
+    csv.field_size_limit(10 * 1024 * 1024)
     with open(csv_file, 'r', encoding='utf-8-sig', newline='') as f:
         reader = csv.DictReader(f)
         return [row for row in reader]
