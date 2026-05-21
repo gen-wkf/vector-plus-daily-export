@@ -1,0 +1,154 @@
+###
+@base_url_vecteur_plus = https://webservices.vecteurplus.com/ws/v1/smac-sa
+
+###
+POST {{base_url_vecteur_plus}}/login
+Accept: application/json
+Content-Type: application/json
+
+{
+	"password": "29dcb259fe5eca4c062f1b8192dc9d29902ed7a4d8e2714638dd0e52920f5e23"
+}
+
+>> responses/auth_clients.json
+
+###
+@token_vecteur_plus = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im5fQkVBdEpvYSIsImVudHJ5Ijoic21hYy1zYSIsIm9wdGlvbnMiOnsidmMiOnsiZW5hYmxlZCI6dHJ1ZX0sIndlYmhvb2siOnsiZW5hYmxlZCI6ZmFsc2UsImRlbGF5Ijo1MDB9fSwiaWF0IjoxNzc5MDk5NTA1LCJleHAiOjE3NzkxMjgzMDV9.JvU_crY3xSTr1EOxh3CfZZ4L3G0-JyGCbcl5wN3I5xw
+GET {{base_url_vecteur_plus}}/documentations
+Accept: application/json
+Authorization: Bearer {{token_vecteur_plus}}
+
+>> responses/documentation.html
+
+###
+@clientId = 2370
+@applicationId = 42013
+PUT {{base_url_vecteur_plus}}/{{clientId}}/{{applicationId}}/marches/search
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token_vecteur_plus}}
+
+{
+	"query": {
+		"page": 1,
+		"size": 100
+	},
+	"facets": {
+		"date_modification": {
+			"from": "2023-01-01T00:00:00.000"
+		},
+		"sort": {
+			"selected": {
+				"code": "date_livraison",
+				"order": "desc"
+			}
+		},
+		"filter_groups": [
+			{
+				"name": "motif",
+				"filters": [
+					{
+						"name": "NOUVEAU",
+						"value": true
+					},
+					{
+						"name": "COMPLEMENT",
+						"value": true
+					},
+					{
+						"name": "RECTIFICATIF",
+						"value": true
+					}
+				]
+			},
+			{
+				"name": "statut",
+				"filters": [
+					{
+						"name": "archive",
+						"value": false
+					}
+				]
+			},
+			{
+				"name": "resultat",
+				"filters": [
+					{
+						"name": "SalesForce",
+						"value": false
+					},
+					{
+						"name": "CRM",
+						"value": false
+					},
+					{
+						"name": "En attente",
+						"value": false
+					},
+					{
+						"name": "Hubspot",
+						"value": false
+					}
+				]
+			}
+		]
+	}
+}
+
+>> responses/markets.json
+
+# produit, statut, motif, procedure, resultat, type_procedure_arrete, profils, suivi, champs_personnalises
+###
+@filterKey = resultat
+GET {{base_url_vecteur_plus}}/{{clientId}}/{{applicationId}}/filters
+Accept: application/json
+Authorization: Bearer {{token_vecteur_plus}}
+
+###
+@marcheId = qqm5Ux9kysu
+GET {{base_url_vecteur_plus}}/{{clientId}}/{{applicationId}}/marches/{{marcheId}}
+Accept: application/json
+Authorization: Bearer {{token_vecteur_plus}}
+
+>> responses/market.json
+
+###
+PUT https://webservices.vecteurplus.com/ws/v1/smac-sa/2370/37051/marches/search
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token_vecteur_plus}}
+
+{
+	"query": {
+		"page": 100,
+		"size": 100
+	},
+	"facets": {
+        "sort":{
+            "selected": {
+                "code": "date_livraison",
+                "order": "desc"
+            }
+        },
+		"filter_groups": [
+			{
+				"name": "resultat",
+				"filters": [
+					{
+						"name": "SalesForce",
+						"value": false
+					}, {
+						"name": "CRM",
+						"value": false
+					}, {
+						"name": "En attente",
+						"value": false
+					}, {
+						"name": "Hubspot",
+						"value": false
+					}
+				]
+			}
+		]
+	}
+}

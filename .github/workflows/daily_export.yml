@@ -1,0 +1,58 @@
+name: Daily Vecteur Plus Export
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Tous les jours à 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  daily-export:
+    runs-on: ubuntu-latest
+    env:
+      PASSWORD: ${{ secrets.VECTEUR_PLUS_PASSWORD }}
+      BASE_URL: ${{ secrets.VECTEUR_PLUS_BASE_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run export_vecteur_markets.py
+        run: |
+          cmd=(python scripts/export_vecteur_markets.py --output-prefix responses/all_markets --password "$PASSWORD")
+          if [ -n "$BASE_URL" ]; then
+            cmd+=(--base-url "$BASE_URL")
+          fi
+          "${cmd[@]}"
+
+      - name: Run convert_json_to_table.py
+        run: |
+          python scripts/convert_json_to_table.py responses/all_markets.json responses/all_markets_table
+
+      - name: Commit generated export files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add responses/*.json responses/*.csv responses/*.xlsx || true
+          if git diff --cached --quiet; then
+            echo "No generated files changed; nothing to commit."
+          else
+            git commit -m "Automated daily export: $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
+
+      - name: Upload export artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vecteur-plus-daily-export
+          path: |
+            responses/all_markets.json
+            responses/all_markets.csv
+            responses/all_markets.xlsx
+            responses/all_markets_table.csv
+            responses/all_markets_table.xlsx
+            responses/all_markets_errors.json

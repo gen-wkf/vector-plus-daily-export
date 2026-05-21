@@ -1,0 +1,22 @@
+Convertir un fichier JSON contenant un array JSON en table dans un fichier CSV et XLSX. Voici les correspondances `"Entête" -> "Attribut JSON"` avec commentaires. Les attributs de mes objets seront donnés sous la forme `attr/sous-attr/sous-sous-attr/...`
+
+"Nom de l'AO" -> `objet_marche`
+"Lieu des travaux" -> `localisation/site_execution` // c'est un array. Faire un array de string avec tous les `libelle`
+"Etablissement SMAC" -> `` // cette colonne est à rentrer manuellement
+"Source de l'AO" -> `` // mettre `Vecteur Plus` pour tous les AOs
+"Date de Saisie" -> `application_data/livraison/date_premiere_livraison` // Ne prendre que la date. (`YYYY-MM-DD`)
+"SI Rectificatif" -> `application_data/livraison/motif`
+"Nom du Client final" -> `` // dans `participation/societes_intervenantes`, nous avons un array de participant. Nous prendrons le `societe/raison_sociale` dans le cas où il y a un participant dont le `role/code = "moa"` sinon `role/code = "categorie"` sinon null.
+"Date limite remise offre" -> `calendrier/date_limite_remise_offres/date` // Ne prendre que la date. (`YYYY-MM-DD`)
+"Heure limite de remise offre" -> `calendrier/date_limite_remise_offres/date` // Ne prendre que l'heure'. (`HH:mm`)
+"Nom de l'architecte" -> `` // dans `participation/societes_intervenantes`, nous avons un array de participant. Nous prendrons le `societe/raison_sociale` dans le cas où il y a un participant dont le `role/code = "architecte"` sinon null.
+"Nom de l'économiste" -> `` // dans `participation/societes_intervenantes`, nous avons un array de participant. Nous prendrons le `societe/raison_sociale` dans le cas où il y a un participant dont le `role/code = "economiste"` sinon null.
+"Nom de l'entreprise générale" -> `` // dans `participation/societes_intervenantes`, nous avons un array de participant. Nous prendrons le `societe/raison_sociale` dans le cas où il y a un participant dont le `role/code = "entreprise_generale"` sinon `role/libelle = "Entreprise autre"` sinon null.
+"Public/Privé" -> `qualification/type_procedure/libelle`
+"Nature du projet" -> `qualification/natures_projet`
+"Visite de site" -> `` // prendre le premier non-null (coalesce) entre `qualification/renseignements_complementaires` et
+"Lien vers AO" -> `` // prendre le premier non-null (coalesce) entre `qualification/dce_url` et `dce_data/url`
+"Technique" -> `qualification/renseignements_techniques`
+"Description technique" -> `` // dans `lotissement/lots` nous avons un array de participant. Faire un array de string avec tous les `objet_lot`
+
+
