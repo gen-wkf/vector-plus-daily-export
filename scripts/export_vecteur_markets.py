@@ -32,7 +32,6 @@ from urllib import error, request
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 
-DEFAULT_HTTP_FILE = PROJECT_ROOT / "app.http"
 DEFAULT_OUTPUT_PREFIX = PROJECT_ROOT / "responses/all_markets"
 DEFAULT_PAGE_START = 1
 DEFAULT_PAGE_END = 6
@@ -91,7 +90,6 @@ def parse_args() -> argparse.Namespace:
             "Fetch market details for all client/application pairs and export JSON/CSV/XLSX files."
         )
     )
-    parser.add_argument("--http-file", type=Path, default=DEFAULT_HTTP_FILE)
     parser.add_argument("--base-url", type=str, default=None)
     parser.add_argument("--password", type=str, default=None, help="Vecteur Plus login password.")
     parser.add_argument("--token", type=str, default=None, help="Override token returned by /login.")
@@ -153,25 +151,6 @@ def parse_id_filter(raw: str) -> set[int] | None:
     return ids
 
 
-def read_http_variable(path: Path, name: str) -> str | None:
-    pattern = re.compile(rf"@{re.escape(name)}\s*=\s*(\S+)")
-    try:
-        content = path.read_text(encoding="utf-8")
-    except OSError:
-        return None
-
-    match = pattern.search(content)
-    return match.group(1).strip() if match else None
-
-
-def read_http_login_password(path: Path) -> str | None:
-    try:
-        content = path.read_text(encoding="utf-8")
-    except OSError:
-        return None
-
-    match = re.search(r'"password"\s*:\s*"([^"]+)"', content)
-    return match.group(1) if match else None
 
 
 def resolve_base_url(args: argparse.Namespace) -> str:
@@ -186,17 +165,8 @@ def resolve_base_url(args: argparse.Namespace) -> str:
     if env_base_url:
         return env_base_url.rstrip("/")
 
-    base_url = read_http_variable(args.http_file, "base_url_vecteur_plus")
-    if base_url:
-        return base_url.rstrip("/")
-
-    if not args.http_file.exists():
-        raise RuntimeError(
-            "Unable to read app.http and no --base-url was provided."
-        )
     raise RuntimeError(
-        f"Could not extract @base_url_vecteur_plus from {args.http_file}. "
-        "Provide --base-url or set BASE_URL_VECTEUR_PLUS / VECTEUR_PLUS_BASE_URL."
+        "No base URL provided. Set --base-url or configure BASE_URL / BASE_URL_VECTEUR_PLUS / VECTEUR_PLUS_BASE_URL."
     )
 
 
@@ -892,15 +862,10 @@ def main() -> int:
         print(str(exc), file=sys.stderr)
         return 1
 
-    password = (
-        args.password
-        or os.environ.get("VECTEUR_PLUS_PASSWORD")
-        or read_http_login_password(args.http_file)
-    )
+    password = args.password or os.environ.get("VECTEUR_PLUS_PASSWORD")
     if not password:
         print(
-            f"No login password found. Provide --password, set VECTEUR_PLUS_PASSWORD, "
-            f"or add it to {args.http_file}.",
+            "No login password found. Provide --password or set VECTEUR_PLUS_PASSWORD.",
             file=sys.stderr,
         )
         return 1
