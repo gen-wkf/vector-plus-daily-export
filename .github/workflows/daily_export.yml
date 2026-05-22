@@ -65,7 +65,8 @@ jobs:
             git fetch origin main --quiet
             git rebase origin/main || git pull --rebase origin main || true
             git commit -m "Automated daily export: $(date -u +'%Y-%m-%d %H:%M UTC')"
-            git push origin HEAD:main
+            # Push generated exports to a dedicated branch to avoid merge conflicts on main
+            git push origin HEAD:exports
           fi
 
       - name: Send export via email
