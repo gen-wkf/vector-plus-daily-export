@@ -28,6 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -60,8 +61,11 @@ jobs:
           if git diff --cached --quiet; then
             echo "No generated files changed; nothing to commit."
           else
+            # Fetch remote changes and rebase to avoid push rejects
+            git fetch origin main --quiet
+            git rebase origin/main || git pull --rebase origin main || true
             git commit -m "Automated daily export: $(date -u +'%Y-%m-%d %H:%M UTC')"
-            git push
+            git push origin HEAD:main
           fi
 
       - name: Send export via email
